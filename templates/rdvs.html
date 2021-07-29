@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block title %}  RDVS     {% endblock %}
+
+
+
+{% block body %}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+            <div class="jumbtron p-3">
+                <h2>Manage Patient <b>Appointments</b><button type="button"  class="btn btn-success float-right">Back </button></h2>
+               
+               <div class="container-fluid">
+                <table class="table table-hover table-dark table-sm">
+                    <tr>
+                        <th>ID</th>
+                        <th>Last Name</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Telephone</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                  
+                    <tr>
+
+                        <td>
+                            
+                            <a href="" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalrdv">New RDV</a>
+                            <a href="" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit">Edit RDV</a>
+                            <a href="" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete ?')">Delete RDV</a>
+                            
+                        </td>
+
+                    </tr>
+                </div>
+                    {% endblock %}

@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% include 'header.html' %}
+
+{% block title %} Home     {% endblock %}
+
+
+
+{% block body %}
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col md-12">
+            <div class="jumbtron p-3">
+                <h2>Manage <b>Patients</b><button type="button"  class="btn btn-success float-right"data-toggle="modal" data-target="#mymodal">Add new patient</button></h2>
+               
+                {% with messages = get_flashed_messages() %} 
+                 <!-- built in method of flash -->
+                {% if messages %}
+ 
+                {% for message in messages %}
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                        {{message}}
+                </div>
+ 
+                {% endfor %}
+ 
+                {% endif %}
+                {% endwith%} 
+               
+               
+                <table class="table table-hover table-dark table-sm">
+                    <tr>
+                        <th>ID</th>
+                        <th>Last Name</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Telephone</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                    {% for row in patients %}
+                    <tr>
+                        <td>{{row.id}}</td>
+                        <td>{{row.last_name}}</td>
+                        <td>{{row.name}}</td>
+                        <td>{{row.address}}</td>
+                        <td>{{row.telephone}}</td>
+                        <td>{{row.email}}</td>
+
+                    <tr>
+
+                        <td>
+                           <a href="{{url_for('see_rdvs')}}" class="btn btn-primary btn-xs">View RDVs</a>
+                            <a href="" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalrdv">New RDV</a>
+                            <a href="/update/{{row.id}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.id}}">Edit</a>
+                            <a href="/delete/{{row.id}}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete ?')">Delete</a>
+                            
+                        </td>
+
+                    </tr>
+<!-- Modal  RVD-->
+<div id="modalrdv" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h4 class="modal-title">Book an appointment</h4>
+          </div>
+      
+      <div class="modal-body">
+        <form role="form" method="post" action="#">
+         <label for="fName">First Name</label>
+          <input type="text" class="form-control" id="fName" required><br>
+         <label for="lName">Last Name</label>
+          <input type="text" class="form-control" id="lName"><br>
+         <label for="emailId">Email </label>
+          <input type="email" class="form-control" id="emailId"><br>
+         <label for="mobileNo" >Telephone</label>
+          <input type="mobileNo" class="form-control" id="mobileNo" required><br>
+          <label for="doctorName">Doctor's Name</label>
+          <input type="text" class="form-control" id="doctorName" placeholder="Only if you are booking an appointment for a Doctor." ><br>  
+         <label for="hospitalName">Hospital's Name</label>
+          <input type="text" class="form-control" id="hospitalName" placeholder="Only if you are booking an appointment for a Hospital."><br>
+  
+  <label for="datetimepicker11">Preferred Date & Time</label>
+  <div class="container">
+      <div class="col-sm-6 col-md-6">
+          <div class="form-group">
+              <div class='input-group date' id='datetimepicker11'>
+                  <input type='text' class="form-control" />
+                  <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar">
+                      </span>
+                  </span>
+              </div>
+          </div>
+      </div>
+  </div><br>
+          
+          <div class="form-group">
+    <label for="comment">Reason for the Appointment</label>
+    <textarea class="form-control" rows="5" id="comment"></textarea>
+  </div>
+         
+          <button type="submit" id="submit" class="btn btn-info">Get an Appointment</button>
+        </form>
+       
+       </div> 
+       
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+       </div>
+    </div>
+    </div>
+      
+    </div>
+  </div>
+        <!-- Modal Edit patient-->
+<div id="modaledit{{row.id}}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+             <h4 class="modal-title">Update Patient Information</h4>
+          </div>
+          <div class="modal-body">
+  
+  
+             <form action="{{url_for('update')}}" method="POST">
+  
+                <div class="form-group">
+  
+                    <label>Last name:</label>
+                    <input type="hidden"  name="id" value="{{row.id}}">
+                    <input type="text" class="form-control" name="last_name" value="{{row.last_name}}" required="1">
+   
+   
+                 </div>
+                 <div class="form-group">
+   
+                     <label>Name:</label>
+                     <input type="text" class="form-control" name="name"  value="{{row.name}}" required="1">
+    
+    
+                  </div>
+   
+   
+                  <div class="form-group">
+   
+   
+                     <label>Address:</label>
+                     <input type="text" class="form-control" name="address" value="{{row.address}}" required="1">
+    
+    
+                  </div>
+                  <div class="form-group">
+   
+   
+                    <label>Email:</label>
+                    <input type="email" class="form-control" name="email" value="{{row.email}}"required="1">
+   
+   
+                 </div>
+   
+   
+                  <div class="form-group">
+   
+   
+                    <label>Telephone:</label>
+                    <input type="number" class="form-control" name="telephone" value="{{row.telephone}}" required="1">
+   
+   
+                 </div>
+   
+   
+   
+                 <div class="form-group">
+   
+  
+  
+  
+                
+  
+  
+                
+  
+  
+                   <button class="btn btn-primary" type="submit">Update</button>
+  
+  
+                </div>
+  
+  
+             </form>
+  
+  
+          </div>
+  
+  
+          <div class="modal-footer">
+  
+  
+             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  
+  
+          </div>
+  
+  
+       </div>
+  
+  
+    </div>
+  
+ </div>
+          
+                  {% endfor%}
+                  
+                </table>
+                       
+</div>
+ <!-- Modal Add Employee-->
+ 
+ <div id="mymodal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+       <div class="modal-content">
+          <div class="modal-header">
+  
+             <h4 class="modal-title">Add patient</h4>
+          </div>
+          <div class="modal-body">
+  
+             <form action="{{url_for('insert')}}" method="POST">
+  
+  
+                <div class="form-group">
+  
+                   <label>Last name:</label>
+                   <input type="text" class="form-control" name="last_name" required="1">
+  
+  
+                </div>
+                <div class="form-group">
+  
+                    <label>Name:</label>
+                    <input type="text" class="form-control" name="name" required="1">
+   
+   
+                 </div>
+  
+  
+                 <div class="form-group">
+  
+  
+                    <label>Address:</label>
+                    <input type="text" class="form-control" name="address" required="1">
+   
+   
+                 </div>
+                 <div class="form-group">
+  
+  
+                   <label>Email:</label>
+                   <input type="email" class="form-control" name="email" required="1">
+  
+  
+                </div>
+  
+  
+                 <div class="form-group">
+  
+  
+                   <label>Telephone:</label>
+                   <input type="number" class="form-control" name="telephone" required="1">
+  
+  
+                </div>
+  
+  
+  
+                <div class="form-group">
+  
+  
+                   <button class="btn btn-primary" type="submit">Add patient</button>
+  
+  
+                </div>
+  
+  
+             </form>
+  
+  
+          </div>
+  
+  
+          <div class="modal-footer">
+  
+  
+             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+  
+  
+          </div>
+  
+  
+       </div>
+  
+  
+    </div>
+  
+  
+ </div>
+  
+  
+  
+  
+  
+         </div>
+  
+     </div>
+  
+  
+ </div>
+{% endblock %}
