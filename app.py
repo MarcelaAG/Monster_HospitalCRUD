@@ -48,6 +48,7 @@ class Patients(db.Model):
         self.telephone = telephone
         self.email = email
 
+# This is my RDV table 
 class RDV(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     patient_id =  db.Column(db.Integer, db.ForeignKey('patients.id'))
@@ -65,40 +66,37 @@ class RDV(db.Model):
         self.rdv_time = rdv_time
         self.doctor = doctor
  
- #This is the index route to
-#query on all the patient data
+ #This is the index route to query on all the patient data
 @app.route('/')
 def Index():
         all_data = Patients.query.all()
         return render_template('index.html', patients = all_data)
 
-#This is the rdv route to
-# patient appointments
+#This is the rdv route to query patient appointments
 @app.route('/rdvs', methods = ['GET'])
 def see_rdvs():
     all_rdv = RDV.query.all()
     return render_template('rdvs.html', rdv = all_rdv)
 
+# This is the route to see  patient rdv(s) in rdv html page 
+@app.route('/rdvs/<id>/', methods = ['GET'])
+def rdvs(id):
+    #if request.method == 'GET':
 
-#     # all_rdv = RDV.query.get(request.form.get('id'))
-#     # all_rdv.patient_id = request.form['id']
-#     # all_rdv.last_name = request.form['last_name']
-#     # all_rdv.name = request.form['name']
-#     # all_rdv.address = request.form['rdv_date']
-#     # all_rdv.telephone = request.form['rdv_time']
-#     # all_rdv.email = request.form['doctor']
+        # results = Patients.query.join(RDV, Patients.id == RDV.patient_id)\
+        # .add_columns(Patients.last_name, Patients.name, RDV.rdv_date, RDV.rdv_time, RDV.doctor)\
+        # .filter (Patients.id == id)    
+        # results.last_name=['last_name']
+        # results.name=['name']
+        # results.rdv_date=['rdv_date']
+        # results.rdv_time=['rdv_time']
+        # results.doctor = ['doctor']
+       
+        results = RDV.query.filter_by(patient_id=id)
+        return render_template('rdvs.html', rdv = results)
 
 
-#     # return redirect(url_for('rdvs'))
-#     # if request.method == 'POST':
-#     #       results = Patients.query.join(RDV, Patients.id == RDV.patient_id)\
-#     #     .add_columns(Patients.last_name, Patients.name, RDV.rdv_date, RDV.rdv_time, RDV.doctor)\
-#     #     .filter (Patients.id == id)    
-
-
-#     return render_template('rdvs.html', rdv=all_rdv )       
-
-# This  is the add new rdv route for inserting data to sqlite database via html forms
+# This is the route to add new rdv  via html modal form
 @app.route('/new', methods = ['POST'])
 def new():
  
@@ -118,7 +116,7 @@ def new():
  
         return redirect(url_for('Index'))
 
-# # This  is the add new data route for inserting data to sqlite database via html forms
+# This  is the route to add new patient via html modal form
 @app.route('/insert', methods = ['POST'])
 def insert():
  
@@ -139,8 +137,28 @@ def insert():
         # flash("Patient  Inserted Successfully")
  
         return redirect(url_for('Index'))
+
+
+ # This is the route to edit patient rdv
+@app.route('/editRdv', methods = ['GET', 'POST'])
+def editRdv():
+
+     if request.method == 'POST':
+        my_data = RDV.query.get(request.form.get('id'))
+        
+        my_data.last_name = request.form['last_name']
+        my_data.name = request.form['name']
+        my_data.rdv_date = request.form['rdv_date']
+        my_data.rdv_time = request.form['rdv_time']
+        my_data.doctor = request.form['doctor']
+
+        db.session.commit()
+        flash("Patient RDV Updated Successfully")
  
- #this is the update route to update patient info
+        return redirect(url_for('see_rdvs'))
+       
+ 
+ # This is the route to update patient info
 @app.route('/update', methods = ['GET', 'POST'])
 def update():
  
@@ -158,29 +176,17 @@ def update():
  
         return redirect(url_for('Index'))
 
-# This is the route to see  patient rdv in rdv page 
-@app.route('/rdvs/<id>/', methods = ['GET'])
-def rdvs(id):
-    if request.method == 'GET':
+# This route is for deleting a rdv
+@app.route('/deleteRdv/<id>/', methods = ['GET', 'POST'])
+def deleteRdv(id):
+    my_data = RDV.query.get(id)
+    db.session.delete(my_data)
+    db.session.commit()
+    flash("Patient appointment deleted successfully")
+ 
+    return redirect(url_for('see_rdvs'))
 
-        results = Patients.query.join(RDV, Patients.id == RDV.patient_id)\
-        .add_columns(Patients.last_name, Patients.name, RDV.rdv_date, RDV.rdv_time, RDV.doctor)\
-        .filter (Patients.id == id)    
-        # results.last_name=['last_name']
-        results.name=['name']
-        results.rdv_date=['rdv_date']
-        results.rdv_time=['rdv_time']
-        results.doctor = ['doctor']
-       
-        # db.session.commit()
-        # flash("Patient info Updated Successfully")
-        return render_template('rdvs.html', rdv = results)
-                #  return redirect(url_for('Index'))
-
-
-
-
-#This route is for deleting a patient
+# This route is for deleting a patient
 @app.route('/delete/<id>/', methods = ['GET', 'POST'])
 def delete(id):
     my_data = Patients.query.get(id)
